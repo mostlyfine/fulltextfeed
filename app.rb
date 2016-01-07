@@ -24,7 +24,7 @@ get '/' do
       content ||= ReadabilityParser.parse(entry.link).content
       entry.description = "<![CDATA[ " + content + " ]]>"
       entry.content_encoded = "<![CDATA[ " + content + " ]]>"
-      @redis.set(entry.link, content)
+      @redis.setex(entry.link, 86400, content)
     rescue => ex
       logger.error entry.link
     rescue
