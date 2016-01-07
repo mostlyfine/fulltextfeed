@@ -17,7 +17,7 @@ configure do
 end
 
 get '/' do
-  rss = RSS::Parser.parse(params[:url])
+  rss = RSS::Parser.parse(params[:url]) rescue redirect(params[:url])
   rss.items.each do |entry|
     begin
       content = @redis.get(entry.link)
