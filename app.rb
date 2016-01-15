@@ -1,6 +1,5 @@
 require 'bundler'
 Bundler.require
-require 'rss'
 
 before do
   @redis = if ENV['REDISTOGO_URL']
@@ -21,19 +20,18 @@ end
 
 get '/' do
   feed_urls = Feedbag.find(params[:url])
-  rss = RSS::Parser.parse(feed_urls.first)
+  @rss = Feedjira::Feed.fetch_and_parse(feed_urls.first)
 
-  rss.items.each do |entry|
+  @rss.entries.each do |entry|
     begin
-      content = @redis.get(entry.link)
-      content ||= ReadabilityParser.parse(entry.link).content
-      entry.description = entry.content_encoded = "<![CDATA[ #{content} ]]>"
-      @redis.setex(entry.link, 86400, content)
+      content = @redis.get(entry.url)
+      content ||= ReadabilityParser.parse(entry.url).content
+      entry.summary = entry.content = content
+      @redis.setex(entry.url, 86400, content)
     rescue => ex
-      logger.error entry.link
+      logger.error entry.url
     end
   end
 
-  content_type 'application/rss+xml'
-  rss.to_s
+  builder :feed
 end
