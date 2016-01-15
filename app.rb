@@ -1,7 +1,6 @@
-require 'sinatra'
+require 'bundler'
+Bundler.require
 require 'rss'
-require 'readability_parser'
-require 'redis'
 
 before do
   @redis = if ENV['REDISTOGO_URL']
