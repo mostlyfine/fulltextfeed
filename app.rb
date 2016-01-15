@@ -15,8 +15,14 @@ configure do
   ReadabilityParser.api_token = ENV['API_TOKEN']
 end
 
+error do
+  redirect(params[:url])
+end
+
 get '/' do
-  rss = RSS::Parser.parse(params[:url]) rescue redirect(params[:url])
+  feed_urls = Feedbag.find(params[:url])
+  rss = RSS::Parser.parse(feed_urls.first)
+
   rss.items.each do |entry|
     begin
       content = @redis.get(entry.link)
