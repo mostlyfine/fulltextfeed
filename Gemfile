@@ -8,6 +8,7 @@ gem 'redis'
 gem 'feedbag'
 gem 'feedjira'
 gem 'builder'
+gem 'puma'
 
 group :development do
   gem 'rerun'
